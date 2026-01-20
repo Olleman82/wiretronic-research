@@ -305,15 +305,22 @@ export default function Home() {
   return (
     <div className="min-h-screen px-6 py-10">
       <div className="mx-auto flex max-w-6xl flex-col gap-10">
-        <header className="flex flex-col gap-4">
-          <p className="text-sm uppercase tracking-[0.3em] text-[var(--muted)]">Wiretronic Research</p>
-          <h1 className="font-[var(--font-display)] text-4xl font-semibold text-[var(--accent-strong)] md:text-5xl">
-            Researcha artiklar snabbare och jämför leverantörer i realtid.
-          </h1>
-          <p className="max-w-3xl text-base text-[var(--muted)]">
-            Klistra in dina artikelnummer, välj resonemangsnivå och få bästa pris per artikel. Leverantörer som saknar
-            lagersaldo eller leveranstid ignoreras.
-          </p>
+        <header className="flex flex-wrap items-start justify-between gap-6">
+          <div className="flex flex-col gap-4">
+            <p className="text-sm uppercase tracking-[0.3em] text-[var(--muted)]">Wiretronic Research</p>
+            <h1 className="font-[var(--font-display)] text-4xl font-semibold text-[var(--accent-strong)] md:text-5xl">
+              Researcha artiklar snabbare och jämför leverantörer i realtid.
+            </h1>
+            <p className="max-w-3xl text-base text-[var(--muted)]">
+              Klistra in dina artikelnummer, välj resonemangsnivå och få bästa pris per artikel. Leverantörer som saknar
+              lagersaldo eller leveranstid ignoreras.
+            </p>
+          </div>
+          {progress.total > 0 && progress.done === progress.total && costEstimate ? (
+            <div className="rounded-full border border-[var(--border)] bg-white/80 px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-[var(--accent-strong)]">
+              Estimerad kostnad: {formatUsd(costEstimate.total)}
+            </div>
+          ) : null}
         </header>
 
         <section className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
@@ -420,48 +427,6 @@ export default function Home() {
               {progress.total ? `${progress.done} av ${progress.total} färdiga` : "Ingen körning"}
             </p>
           </div>
-          {progress.total > 0 && progress.done === progress.total && costEstimate ? (
-            <div className="mt-4 rounded-2xl border border-[var(--border)] bg-[var(--surface-muted)] p-4 text-sm text-[var(--muted)]">
-              <div className="flex flex-wrap items-center justify-between gap-2">
-                <span className="text-xs uppercase tracking-[0.2em]">Estimerad kostnad</span>
-                <span className="text-base font-semibold text-[var(--accent-strong)]">
-                  {formatUsd(costEstimate.total)}
-                </span>
-              </div>
-              <div className="mt-2 grid gap-1 text-xs">
-                <span>Input: {formatUsd(costEstimate.inputCost)} • Cached input: {formatUsd(costEstimate.cachedCost)}</span>
-                <span>Output: {formatUsd(costEstimate.outputCost)} • Web search: {formatUsd(costEstimate.webSearchCost)}</span>
-                <span>Modell: {COSTS.model} • Web search debiteras per call.</span>
-              </div>
-            </div>
-          ) : null}
-          {selectedSummary.rows.length > 0 ? (
-            <div className="mt-6 rounded-2xl border border-[var(--border)] bg-[var(--surface-muted)] p-4">
-              <div className="flex flex-wrap items-center justify-between gap-3">
-                <h3 className="text-sm font-semibold text-[var(--accent-strong)]">Vald order (sammanfattning)</h3>
-                <p className="text-sm text-[var(--accent-strong)]">
-                  Total: {formatSek(selectedSummary.total)}
-                </p>
-              </div>
-              <div className="mt-3 grid gap-2 text-xs text-[var(--muted)]">
-                {selectedSummary.rows.map((row) => (
-                  <div
-                    key={`${row.partNumber}-${row.vendor}`}
-                    className="grid gap-2 rounded-xl border border-[var(--border)] bg-white/70 p-3 md:grid-cols-[1.2fr_0.6fr_1fr_0.6fr_0.8fr]"
-                  >
-                    <div>
-                      <p className="font-semibold text-[var(--accent-strong)]">{row.partNumber}</p>
-                      <p>{row.vendor}</p>
-                    </div>
-                    <div>Antal: {row.quantity}</div>
-                    <div>Styck: {formatSek(row.unitSek)}</div>
-                    <div>Total: {formatSek(row.totalSek)}</div>
-                    <div>{row.leadTime}</div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          ) : null}
           <div className="mt-6 space-y-4">
             {results.length === 0 ? (
               <div className="rounded-2xl border border-dashed border-[var(--border)] p-6 text-sm text-[var(--muted)]">
@@ -469,7 +434,12 @@ export default function Home() {
               </div>
             ) : (
               results.map((result, index) => (
-                <div key={`${result.item.partNumber}-${index}`} className="rounded-2xl border border-[var(--border)] p-4">
+                <div
+                  key={`${result.item.partNumber}-${index}`}
+                  className={`rounded-2xl border border-[var(--border)] p-4 ${
+                    index % 2 === 0 ? "bg-white/80" : "bg-[var(--surface-muted)]"
+                  }`}
+                >
                   <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
                     <div>
                       <p className="text-xs uppercase tracking-[0.2em] text-[var(--muted)]">Artikel</p>
@@ -604,6 +574,36 @@ export default function Home() {
               ))
             )}
           </div>
+          {selectedSummary.rows.length > 0 ? (
+            <div className="mt-8 rounded-3xl border border-[var(--border)] bg-[var(--surface-muted)] p-5">
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <div>
+                  <p className="text-xs uppercase tracking-[0.2em] text-[var(--muted)]">Orderns sammanfattning</p>
+                  <h3 className="text-base font-semibold text-[var(--accent-strong)]">Valda leverantörer</h3>
+                </div>
+                <p className="text-base font-semibold text-[var(--accent-strong)]">
+                  Total: {formatSek(selectedSummary.total)}
+                </p>
+              </div>
+              <div className="mt-3 grid gap-2 text-xs text-[var(--muted)]">
+                {selectedSummary.rows.map((row) => (
+                  <div
+                    key={`${row.partNumber}-${row.vendor}`}
+                    className="grid gap-2 rounded-xl border border-[var(--border)] bg-white/70 p-3 md:grid-cols-[1.2fr_0.6fr_1fr_0.6fr_0.8fr]"
+                  >
+                    <div>
+                      <p className="font-semibold text-[var(--accent-strong)]">{row.partNumber}</p>
+                      <p>{row.vendor}</p>
+                    </div>
+                    <div>Antal: {row.quantity}</div>
+                    <div>Styck: {formatSek(row.unitSek)}</div>
+                    <div>Total: {formatSek(row.totalSek)}</div>
+                    <div>{row.leadTime}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ) : null}
         </section>
       </div>
     </div>
