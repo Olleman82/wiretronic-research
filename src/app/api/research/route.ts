@@ -3,7 +3,7 @@ import { runResearchBatch, normalizePriceMode, normalizeReasoningEffort } from "
 import type { ResearchPayload } from "@/lib/types";
 
 export const runtime = "nodejs";
-export const maxDuration = 600;
+export const maxDuration = 300;
 
 export async function POST(request: Request) {
   try {

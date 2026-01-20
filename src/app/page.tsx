@@ -8,7 +8,7 @@ import type { PriceMode, ReasoningEffort, ResearchResult, VendorOfferWithCompute
 import { COSTS } from "@/lib/costs";
 
 const DEFAULT_ITEMS = "1-0987656-1 2st";
-const MAX_PARALLEL = 10;
+const MAX_PARALLEL = 5;
 
 type ResultState = {
   item: ParsedItem;
